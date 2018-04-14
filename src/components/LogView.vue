@@ -1,0 +1,96 @@
+<template>
+  <div> 
+    <div class="mdl-grid">
+      <div class="mdl-cell mdl-cell--3-col mdl-cell mdl-cell--1-col-tablet mdl-cell--hide-phone"></div>
+      <div class="mdl-cell mdl-cell--6-col mdl-cell--4-col-phone">
+        <br><br>
+        
+      <table class="mdl-data-table mdl-js-data-table">
+          <thead>
+              <tr>
+                  <th>DATE</th>
+                  <th>AMOUNT</th>
+                  <th>PER</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr>
+                  <td>2018.03.01</td>
+                  <td>+4$</td>
+                  <td>+2%</td>
+                </tr>
+        
+          </tbody>
+      </table>
+       
+      </div>
+    </div>
+
+
+  </div>
+</template>
+<script>
+  export default {
+    methods: {
+      displayDetails (id) {
+        this.$router.push({name: 'detail', params: { id: id }})
+      },
+      getCats () {
+        if (navigator.onLine) {
+          this.saveCatsToCache()
+          return this.$root.cat
+        } else {
+          return JSON.parse(localStorage.getItem('cats'))
+        }
+      },
+      saveCatsToCache () {
+        this.$root.$firebaseRefs.cat.orderByChild('created_at').once('value', (snapchot) => {
+          let cachedCats = []
+          snapchot.forEach((catSnapchot) => {
+            let cachedCat = catSnapchot.val()
+            cachedCat['.key'] = catSnapchot.key
+            cachedCats.push(cachedCat)
+          })
+          localStorage.setItem('cats', JSON.stringify(cachedCats))
+        })
+      }
+    },
+    mounted () {
+      this.saveCatsToCache()
+    }
+  }
+</script>
+<style scoped>
+  .add-picture-button {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 998;
+  }
+  .take-picture-button {
+    position: fixed;
+    right: 24px;
+    bottom: 90px;
+    z-index: 5;
+  }
+  .image-card {
+    position: relative;
+    margin-bottom: 8px;
+  }
+  .image-card__picture > img {
+    width:100%;
+  }
+  .image-card__comment {
+    position: absolute;
+    bottom: 0;
+    height: 52px;
+    padding: 16px;
+    text-align: right;
+    background: rgba(0, 0, 0, 0.5);
+  }
+  .image-card__comment > span {
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+  }
+</style>
